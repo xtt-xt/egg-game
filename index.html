@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>敲鸡蛋小游戏</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="version-info">版本号1.5</div>
+    
+    <div class="save-btn-sphere" id="saveBtnSphere" onclick="openSaveManager()">
+        <img src="https://img.icons8.com/ios-filled/20/000000/save.png" alt="存档">
+    </div>
+
+    <div class="author-info-btn" id="authorInfoBtn" onclick="openAuthorModal()">
+        <span>!</span>
+    </div>
+    
+    <div class="coin-display" id="coinDisplay">
+        <img src="https://img.icons8.com/ios-filled/24/000000/coin.png" class="coin-icon" alt="金币">
+        <span id="coinCount">0</span>
+    </div>
+
+    <div class="main-menu show" id="mainMenu">
+        <h1>敲鸡蛋小游戏</h1>
+        <button class="menu-button" onclick="showModeSelect()">开始游戏</button>
+        <button class="menu-button" onclick="showSkinSelect()" style="background: #d4c9a8;">切换皮肤</button>
+    </div>
+
+    <div class="mode-select" id="modeSelect">
+        <h2>选择难度</h2>
+        <button class="menu-button" onclick="selectMode('easy')">
+            简单 (100次)
+            <span class="mode-reward"><img src="https://img.icons8.com/ios-filled/20/000000/coin.png" alt="金币">+1</span>
+        </button>
+        <button class="menu-button" onclick="selectMode('normal')">
+            普通 (1000次)
+            <span class="mode-reward"><img src="https://img.icons8.com/ios-filled/20/000000/coin.png" alt="金币">+15</span>
+        </button>
+        <button class="menu-button" onclick="selectMode('hard')">
+            困难 (10000次)
+            <span class="mode-reward"><img src="https://img.icons8.com/ios-filled/20/000000/coin.png" alt="金币">+150</span>
+        </button>
+        <button class="menu-button" onclick="backToMain()" style="background: #d4c9a8;">返回</button>
+    </div>
+
+    <div class="skin-select" id="skinSelect">
+        <h2>选择皮肤</h2>
+        <div class="skin-options" id="skinOptions"></div>
+        <button class="menu-button" onclick="backToMain()" style="background: #d4c9a8; margin-top: 20px;">返回</button>
+    </div>
+
+    <div class="game-container" id="gameContainer">
+        <div class="message" id="message">点击就能敲开鸡蛋辣 😊</div>
+        <div class="egg-wrapper">
+            <img id="egg" src="" alt="鸡蛋" width="160" height="160">
+            <img id="eggshell" src="" alt="蛋壳" width="160" height="160">
+            <img id="chick" src="" alt="小鸡" width="80">
+        </div>
+        <div class="remaining" id="remaining"></div>
+        
+        <div class="music-hint-text" id="musicHintText">点击唱片打开/收起音乐浏览器</div>
+        
+        <button class="end-menu-button" id="endMenuBtn" onclick="returnToMenu()">
+            <span class="btn-text">返回菜单</span>
+            <span class="close-icon">×</span>
+        </button>
+        
+        <div class="dev-mode" id="devMode">
+            <h4>🔧 开发者模式</h4>
+            <div class="dev-controls">
+                <div class="dev-control">
+                    <label>金币</label>
+                    <input type="number" id="devCoins" value="0" min="0">
+                </div>
+                <div class="dev-control">
+                    <label>蓝色皮肤</label>
+                    <select id="devUnlockBlue"><option value="false">锁定</option><option value="true">解锁</option></select>
+                </div>
+                <div class="dev-control">
+                    <label>棕色皮肤</label>
+                    <select id="devUnlockBrown"><option value="false">锁定</option><option value="true">解锁</option></select>
+                </div>
+                <div class="dev-control">
+                    <label>强制退出</label>
+                    <button onclick="forceExitGame()" style="padding: 6px; font-size: 12px; background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; border-radius: 4px; cursor: pointer;">退出游戏</button>
+                </div>
+            </div>
+            <div class="dev-buttons">
+                <button onclick="applyDevSettings()">应用设置</button>
+                <button onclick="closeDevModeFromGame()" style="background: #ffebee; color: #c62828;">关闭</button>
+            </div>
+            <div class="quick-jump-buttons" id="jumpButtonsContainer"></div>
+        </div>
+    </div>
+
+    <img id="recordPlayer" class="record-player" src="https://img.icons8.com/ios-filled/64/000000/vinyl-record.png" alt="唱片" onclick="toggleMusicBrowser()">
+
+    <div class="embedded-browser" id="musicBrowser">
+        <div class="browser-header">
+            <span class="browser-title">🎵 Lava Chicken</span>
+            <button class="browser-close" onclick="closeMusicBrowser()">×</button>
+        </div>
+        <div class="browser-iframe-container">
+            <iframe id="musicIframe" class="browser-iframe" src="about:blank"></iframe>
+        </div>
+    </div>
+
+    <div class="save-manager" id="saveManager">
+        <button class="save-manager-close" onclick="closeSaveManager()">返回菜单</button>
+        <h2>📁 存档管理</h2>
+        <textarea class="save-textarea" id="saveTextarea" placeholder="存档数据..."></textarea>
+        <div style="margin-top: 15px;">
+            <button class="menu-button" onclick="exportSaveData()" style="display: inline-block; width: auto; margin: 5px;">导出存档</button>
+            <button class="menu-button" onclick="importSaveData()" style="display: inline-block; width: auto; margin: 5px;">导入存档</button>
+            <button class="menu-button" onclick="resetSaveData()" style="display: inline-block; width: auto; margin: 5px; background: #ffebee; color: #c62828;">重置存档</button>
+        </div>
+    </div>
+
+    <div class="author-modal" id="authorModal">
+        <button class="author-modal-close" onclick="closeAuthorModal()">返回</button>
+        <div class="author-content">
+            <img src="https://img.icons8.com/color/80/000000/user-male-circle--v1.png" alt="作者头像" class="author-avatar">
+            <div class="author-name">xtt</div>
+            <div class="author-follow">关注作者获取最新版本</div>
+            
+            <div class="changelog-container">
+                <div class="changelog-title">📝 版本更新日志 v1.5</div>
+                <div id="changelogContent">
+                    <div class="changelog-item">修复皮肤解锁后界面状态未刷新问题</div>
+                    <div class="changelog-item">修复重置存档后皮肤列表显示异常问题</div>
+                    <div class="changelog-item">界面动画风格统一优化，提升视觉一致性</div>
+                    <div class="changelog-item">按钮样式调整，拉长按钮并优化金币显示位置</div>
+                    <div class="changelog-item">金币获得动画优化，添加向上滑出效果</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="author-info" id="authorInfo">原作者xtt，禁止转载</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
